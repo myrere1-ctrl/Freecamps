@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free Camps Australia — Content Command Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FBF7EE;
+    --bg-alt:#F3ECDC;
+    --card:#FFFDF8;
+    --ink:#2A2822;
+    --ink-soft:#655F51;
+    --eucalyptus:#4C6650;
+    --eucalyptus-dark:#374B3A;
+    --ochre:#C17A3D;
+    --ochre-soft:#EADFC7;
+    --rust:#A6553A;
+    --line:#E4D9BF;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{font-family:'Fraunces',serif;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+
+  /* --- layout --- */
+  .app{display:flex; min-height:100vh;}
+  .sidebar{
+    width:230px; flex-shrink:0; background:var(--eucalyptus-dark); color:#EFEAD9;
+    padding:24px 16px; position:sticky; top:0; height:100vh; overflow-y:auto;
+  }
+  .brand{display:flex; align-items:center; gap:10px; padding:0 8px 20px 8px; border-bottom:1px solid rgba(255,255,255,0.12); margin-bottom:16px;}
+  .brand-mark{width:34px;height:34px;border-radius:9px;background:var(--ochre); display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:700;color:#2A2822;}
+  .brand-text{line-height:1.15;}
+  .brand-text .l1{font-size:11px; letter-spacing:.08em; opacity:.7; text-transform:uppercase;}
+  .brand-text .l2{font-family:'Fraunces',serif; font-size:15px; font-weight:600;}
+
+  .nav-group{margin-bottom:4px;}
+  .nav-item{
+    display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:9px;
+    font-size:13.5px; color:#D9D3BF; cursor:pointer; margin-bottom:2px; transition:.15s;
+  }
+  .nav-item:hover{background:rgba(255,255,255,0.06); color:#fff;}
+  .nav-item.active{background:var(--ochre); color:#2A2822; font-weight:600;}
+  .nav-icon{width:16px; text-align:center; opacity:.9; font-size:14px;}
+
+  .main{flex:1; min-width:0;}
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 32px; border-bottom:1px solid var(--line); background:var(--bg);
+    position:sticky; top:0; z-index:5;
+  }
+  .topbar .day{font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft);}
+  .topbar h1{font-size:22px; margin:2px 0 0 0;}
+  .content{padding:28px 32px 60px 32px; max-width:1280px;}
+
+  /* route-line signature motif */
+  .route-divider{
+    display:flex; align-items:center; gap:8px; margin:28px 0 18px 0; color:var(--ink-soft);
+  }
+  .route-divider .txt{font-size:11px; letter-spacing:.1em; text-transform:uppercase; white-space:nowrap;}
+  .route-divider .line{flex:1; height:0; border-top:2px dotted var(--line);}
+
+  /* cards */
+  .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:20px;}
+  .grid{display:grid; gap:16px;}
+  .grid-4{grid-template-columns:repeat(4,1fr);}
+  .grid-3{grid-template-columns:repeat(3,1fr);}
+  .grid-2{grid-template-columns:2fr 1fr;}
+  @media(max-width:1000px){.grid-4{grid-template-columns:repeat(2,1fr);} .grid-2{grid-template-columns:1fr;}}
+
+  .pill{display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:99px; font-size:11.5px; font-weight:600; letter-spacing:.02em;}
+  .pill-eucalyptus{background:#E4EBE1; color:var(--eucalyptus-dark);}
+  .pill-ochre{background:var(--ochre-soft); color:#8A5426;}
+  .pill-rust{background:#F1E0D8; color:var(--rust);}
+
+  .kpi-label{font-size:11px; text-transform:uppercase; letter-spacing:.07em; color:var(--ink-soft); margin-bottom:6px;}
+  .kpi-value{font-family:'Fraunces',serif; font-size:26px; font-weight:600;}
+
+  .btn{
+    border:none; border-radius:10px; padding:10px 16px; font-size:13.5px; font-weight:600;
+    cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:.15s;
+  }
+  .btn-primary{background:var(--eucalyptus); color:#fff;}
+  .btn-primary:hover{background:var(--eucalyptus-dark);}
+  .btn-ochre{background:var(--ochre); color:#2A2822;}
+  .btn-ochre:hover{filter:brightness(0.95);}
+  .btn-ghost{background:transparent; color:var(--ink); border:1px solid var(--line);}
+  .btn-ghost:hover{background:var(--bg-alt);}
+  .btn-sm{padding:7px 11px; font-size:12.5px;}
+
+  select,input,textarea{
+    font-family:'Inter',sans-serif; border:1px solid var(--line); border-radius:9px;
+    padding:9px 11px; font-size:13.5px; background:#fff; color:var(--ink); width:100%;
+  }
+  label{font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); display:block; margin-bottom:5px;}
+  .field{margin-bottom:14px;}
+
+  .idea-card{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px; margin-bottom:12px;}
+  .idea-title{font-family:'Fraunces',serif; font-weight:600; font-size:16px; margin:0 0 6px 0;}
+  .idea-hook{font-size:13px; color:var(--ink-soft); font-style:italic; margin-bottom:10px;}
+  .idea-meta{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px;}
+  .idea-actions{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; border-top:1px dashed var(--line); padding-top:10px;}
+
+  .bar-row{display:flex; align-items:center; gap:10px; margin-bottom:10px; font-size:12.5px;}
+  .bar-label{width:110px; flex-shrink:0; color:var(--ink-soft);}
+  .bar-track{flex:1; height:8px; background:var(--bg-alt); border-radius:99px; overflow:hidden;}
+  .bar-fill{height:100%; border-radius:99px; background:var(--eucalyptus);}
+  .bar-val{width:38px; text-align:right; flex-shrink:0; color:var(--ink-soft);}
+
+  .post-output{background:var(--bg-alt); border:1px solid var(--line); border-radius:12px; padding:16px; white-space:pre-wrap; font-size:14px; line-height:1.6;}
+  .section-label{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--ochre); font-weight:700; margin-bottom:6px;}
+
+  .status-tag{font-size:10.5px; padding:2px 8px; border-radius:6px; font-weight:600; letter-spacing:.02em;}
+  .status-IDEA{background:#EFE9DA;color:#7A7156;}
+  .status-DRAFT{background:#E8E0F2;color:#6B4E9C;}
+  .status-READY{background:#DDEAF0;color:#2E6E86;}
+  .status-SCHEDULED{background:var(--ochre-soft);color:#8A5426;}
+  .status-PUBLISHED{background:#DCEBDC;color:var(--eucalyptus-dark);}
+
+  .empty{padding:40px 20px; text-align:center; color:var(--ink-soft); border:1.5px dashed var(--line); border-radius:14px; font-size:13.5px;}
+
+  table{width:100%; border-collapse:collapse; font-size:13px;}
+  th{text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft); padding:8px 10px; border-bottom:1px solid var(--line);}
+  td{padding:10px; border-bottom:1px solid var(--line); vertical-align:top;}
+  tr:hover td{background:var(--bg-alt);}
+
+  .filters{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;}
+  .filters select{width:auto; min-width:120px;}
+
+  .badge-count{background:var(--ochre); color:#2A2822; font-size:10px; padding:1px 6px; border-radius:99px; margin-left:auto; font-weight:700;}
+  .flex-between{display:flex;align-items:center;justify-content:space-between;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">FC</div>
+      <div class="brand-text">
+        <div class="l1">Free Camps AU</div>
+        <div class="l2">Command Center</div>
+      </div>
+    </div>
+    <div class="nav-group" id="navGroup"></div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <div class="day mono" id="topDay">—</div>
+        <h1 id="topTitle">Command Center</h1>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn btn-ghost btn-sm" onclick="resetDemo()">↺ Reset demo data</button>
+      </div>
+    </div>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   DATA LAYER — localStorage, seeded demo data
+   ========================================================= */
+const PILLARS = ["Camp Discovery","Road Trip Planning","Rules & Education","Community / UGC","Gear & Setup","Engagement"];
+const STATES = ["Australia Wide","NSW","VIC","QLD","WA","SA","TAS","NT","ACT"];
+const FORMATS = ["Facebook Post","Question","Poll","Carousel","Infographic","Camp Review","Educational Post","List","Map Concept","Checklist","Guide"];
+const GOALS = ["Comments","Shares","Saves","Traffic","Community","Affiliate","Authority","Viral Reach"];
+const WEEKLY_SCHEDULE = {
+  Monday:{tag:"📍 FREE CAMP MONDAY", pillar:"Camp Discovery"},
+  Tuesday:{tag:"🗺️ ROAD TRIP TUESDAY", pillar:"Road Trip Planning"},
+  Wednesday:{tag:"🧠 CAMPING SCHOOL", pillar:"Rules & Education"},
+  Thursday:{tag:"⚔️ CAMP BATTLE", pillar:"Engagement"},
+  Friday:{tag:"🏆 MEMBER CAMP OF THE WEEK", pillar:"Community / UGC"},
+  Saturday:{tag:"🚐 WEEKEND CAMP FINDER", pillar:"Community / UGC"},
+  Sunday:{tag:"🇦🇺 COMMUNITY CHOICE", pillar:"Engagement"},
+};
+
+function seedIdeas(){
+  return [
+    {id:cid(), title:"7 Free Camps Along The Sydney → Brisbane Route", hook:"Doing the drive up to QLD? Save this before you go.", pillar:"Road Trip Planning", state:"NSW", format:"List", goal:"Saves", desc:"A curated stop-by-stop list of free/low-cost camps between Sydney and Brisbane.", cta:"Save this for your next Big Lap leg.", affiliate:"Low", evergreen:true, status:"READY", createdDaysAgo:1},
+    {id:cid(), title:"Beach Camp or Bush Camp? 🏖️🌲", hook:"Team beach or team bush — no in-between.", pillar:"Engagement", state:"Australia Wide", format:"Poll", goal:"Comments", desc:"Simple either/or poll to drive comment volume.", cta:"Drop your pick below.", affiliate:"None", evergreen:true, status:"IDEA", createdDaysAgo:0},
+    {id:cid(), title:"Can You Actually Sleep At A Rest Area In NSW?", hook:"This gets asked every week — here's the real answer.", pillar:"Rules & Education", state:"NSW", format:"Educational Post", goal:"Authority", desc:"Clarify rest area vs free camp rules, with a Needs Verification flag on specifics.", cta:"Bookmark this for your next trip.", affiliate:"None", evergreen:true, status:"DRAFT", createdDaysAgo:3},
+    {id:cid(), title:"Member Camp Of The Week: Byron Hinterland", hook:"One of our members found this and it's too good not to share.", pillar:"Community / UGC", state:"NSW", format:"Camp Review", goal:"Community", desc:"Feature a member-submitted camp with photo + quote.", cta:"Tag someone who needs this spot.", affiliate:"None", evergreen:false, status:"IDEA", createdDaysAgo:0},
+    {id:cid(), title:"Free Camps Without Power — What's Your Setup?", hook:"No power, no worries. Here's how the group handles it.", pillar:"Gear & Setup", state:"Australia Wide", format:"List", goal:"Affiliate", desc:"Round-up of common off-grid power solutions members use.", cta:"What's in your setup? Comment below.", affiliate:"High", evergreen:true, status:"IDEA", createdDaysAgo:2},
+    {id:cid(), title:"Dog-Friendly Free Camps Around Dubbo", hook:"A member asked, so here's the answer.", pillar:"Camp Discovery", state:"NSW", format:"List", goal:"Saves", desc:"Sourced from a real member comment — mining opportunity.", cta:"Save this if you're travelling with a dog.", affiliate:"None", evergreen:true, status:"IDEA", createdDaysAgo:1},
+  ];
+}
+
+function seedCalendar(){
+  const today = new Date();
+  const items = [];
+  const titles = [
+    "7 Free Camps Sydney → Brisbane","Beach Camp or Bush Camp?","Rest Area Rules Explained",
+    "Member Camp: Byron Hinterland","Free Camps Without Power","Dog-Friendly Camps Dubbo","QLD vs WA — Which Big Lap?"
+  ];
+  for(let i=-2;i<=4;i++){
+    const d = new Date(today); d.setDate(today.getDate()+i);
+    const dayName = d.toLocaleDateString('en-AU',{weekday:'long'});
+    items.push({
+      id:cid(), date:d.toISOString().slice(0,10), dayName,
+      title: titles[(i+2)%titles.length],
+      pillar: WEEKLY_SCHEDULE[dayName]?.pillar || "Engagement",
+      state: "NSW", format:"Facebook Post",
+      status: i<0 ? "PUBLISHED" : (i===0 ? "READY" : "IDEA")
+    });
+  }
+  return items;
+}
+
+function loadDB(){
+  let db = JSON.parse(localStorage.getItem('fc_db')||'null');
+  if(!db){ db = { ideas: seedIdeas(), calendar: seedCalendar(), posts: [], camps: [], campNotes: '' }; saveDB(db); }
+  if(!db.camps) db.camps = [];
+  if(db.campNotes===undefined) db.campNotes = '';
+  return db;
+}
+function saveDB(db){ localStorage.setItem('fc_db', JSON.stringify(db)); }
+function cid(){ return 'id_'+Math.random().toString(36).slice(2,10); }
+let DB = loadDB();
+function resetDemo(){ localStorage.removeItem('fc_db'); DB = loadDB(); render(); }
+
+/* ---- AI settings (separate key, never bundled into exported content) ---- */
+function getAISettings(){
+  return JSON.parse(localStorage.getItem('fc_ai_settings')||'{"apiKey":"","model":"claude-sonnet-5"}');
+}
+function saveAISettings(s){ localStorage.setItem('fc_ai_settings', JSON.stringify(s)); }
+
+/* =========================================================
+   NAV
+   ========================================================= */
+const ROUTES = [
+  {id:'command', label:'Command Center', icon:'◆'},
+  {id:'ideas', label:'Idea Generator', icon:'✦'},
+  {id:'studio', label:'Post Studio', icon:'✎'},
+  {id:'calendar', label:'Calendar', icon:'▤'},
+  {id:'library', label:'Content Library', icon:'▥'},
+  {id:'camps', label:'Camp Database', icon:'📍'},
+  {id:'settings', label:'Settings · AI', icon:'⚙'},
+];
+let currentRoute = 'command';
+
+function renderNav(){
+  const el = document.getElementById('navGroup');
+  el.innerHTML = ROUTES.map(r=>`
+    <div class="nav-item ${r.id===currentRoute?'active':''}" onclick="goTo('${r.id}')">
+      <span class="nav-icon">${r.icon}</span>${r.label}
+    </div>
+  `).join('');
+}
+function goTo(id){ currentRoute = id; render(); }
+
+/* =========================================================
+   SIMULATED AI GENERATION (prototype only — final build calls Claude API)
+   ========================================================= */
+const HOOK_TEMPLATES = [
+  "Ever wondered {topic}? Here's what the group needs to know.",
+  "This one gets asked every week: {topic}",
+  "Save this before your next trip — {topic}",
+  "{topic} — the honest answer.",
+  "A member asked about {topic}. Here's the round-up."
+];
+const CTA_BY_GOAL = {
+  Comments:"What's your take? Drop it in the comments.",
+  Shares:"Tag someone planning this route.",
+  Saves:"Save this for your next trip.",
+  Traffic:"Full details are in the group files.",
+  Community:"Share your own experience below.",
+  Affiliate:"Link to what we use is in the comments.",
+  Authority:"Bookmark this for later.",
+  "Viral Reach":"Share this with your camping mates."
+};
+
+function simulateIdeas(input, count){
+  const out = [];
+  for(let i=0;i<count;i++){
+    const topic = input.topic || `${input.pillar} in ${input.state}`;
+    out.push({
+      id:cid(),
+      title: `${topic}${i>0?` — Part ${i+1}`:''}`,
+      hook: HOOK_TEMPLATES[i%HOOK_TEMPLATES.length].replace('{topic}', topic.toLowerCase()),
+      pillar: input.pillar, state: input.state, format: input.format, goal: input.goal,
+      desc: `A ${input.format.toLowerCase()} covering ${topic.toLowerCase()}, written for ${input.audience || 'the group'}.`,
+      cta: CTA_BY_GOAL[input.goal] || "Let us know what you think.",
+      affiliate: (input.pillar==="Gear & Setup") ? "High" : (input.pillar==="Camp Discovery"?"Low":"None"),
+      evergreen: input.pillar!=="Community / UGC",
+      status:"IDEA", createdDaysAgo:0
+    });
+  }
+  return out;
+}
+
+/* ---- Real Claude API call (used when an API key is saved in Settings) ---- */
+async function callClaude(systemPrompt, userPrompt){
+  const settings = getAISettings();
+  if(!settings.apiKey) return null; // caller falls back to simulation
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'x-api-key': settings.apiKey,
+      'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true'
+    },
+    body: JSON.stringify({
+      model: settings.model || 'claude-sonnet-5',
+      max_tokens: 1200,
+      system: systemPrompt,
+      messages: [{role:'user', content:userPrompt}]
+    })
+  });
+  if(!res.ok){
+    const errText = await res.text();
+    throw new Error(`API error ${res.status}: ${errText.slice(0,200)}`);
+  }
+  const data = await res.json();
+  const textBlock = data.content.find(b=>b.type==='text');
+  return textBlock ? textBlock.text : null;
+}
+
+function campsContextBlock(){
+  let block = '';
+  if(DB.campNotes && DB.campNotes.trim()){
+    block += `\n\nHere are raw reference notes from real camp research. Use these facts only — never invent GPS coordinates, fees, or facilities beyond what's written here. If something isn't mentioned, say "Needs Verification":\n${DB.campNotes.trim().slice(0,6000)}`;
+  }
+  if(DB.camps.length){
+    const rows = DB.camps.slice(0,40).map(c=>`- ${c.name} (${c.state}) — GPS:${c.lat && c.lng ? `${c.lat},${c.lng}` : 'Needs Verification'}${c.cost?`, cost:${c.cost}`:''}${c.notes?`, notes:${c.notes}`:''}`).join('\n');
+    block += `\n\nStructured camp entries:\n${rows}`;
+  }
+  return block;
+}
+
+function simulatePost(input){
+  const hook = `${input.topic}? Here's what our members need to know.`;
+  const body =
+`We get asked about this a lot, so here's the short version.
+
+${input.topic} — a few things worth knowing before you head out:
+• Check current access and any permit requirements before you go
+• Conditions can change with weather and season, always good to double check
+• If you've stayed here recently, drop a comment so the info stays current
+
+This is the kind of thing the group's good at — real, current info from people who've actually been there.`;
+  const cta = CTA_BY_GOAL[input.goal] || "Have you been? Let us know below.";
+  return {hook, body, cta};
+}
+
+/* =========================================================
+   PAGES
+   ========================================================= */
+function render(){
+  renderNav();
+  const el = document.getElementById('content');
+  const titleEl = document.getElementById('topTitle');
+  const dayEl = document.getElementById('topDay');
+  const now = new Date();
+  dayEl.textContent = now.toLocaleDateString('en-AU',{weekday:'long', day:'numeric', month:'long'}).toUpperCase();
+
+  if(currentRoute==='command'){ titleEl.textContent='Command Center'; el.innerHTML = pageCommand(); }
+  if(currentRoute==='ideas'){ titleEl.textContent='Idea Generator'; el.innerHTML = pageIdeas(); wireIdeas(); }
+  if(currentRoute==='studio'){ titleEl.textContent='Post Studio'; el.innerHTML = pageStudio(); wireStudio(); }
+  if(currentRoute==='calendar'){ titleEl.textContent='Content Calendar'; el.innerHTML = pageCalendar(); }
+  if(currentRoute==='library'){ titleEl.textContent='Content Library'; el.innerHTML = pageLibrary(); wireLibrary(); }
+  if(currentRoute==='camps'){ titleEl.textContent='Camp Database'; el.innerHTML = pageCamps(); wireCamps(); }
+  if(currentRoute==='settings'){ titleEl.textContent='Settings · AI'; el.innerHTML = pageSettings(); wireSettings(); }
+}
+
+/* ---- Camp Database ---- */
+function pageCamps(){
+  const s = getAISettings();
+  return `
+    <div class="card">
+      <h3 style="margin-top:0; font-size:15px;">Reference notes from your scraper</h3>
+      <div style="font-size:12px; color:var(--ink-soft); margin-bottom:8px;">
+        Paste your scraper output as-is — markdown, plain text, whatever format it's already in. No reformatting needed. This gets used as background reference when generating ideas and posts, so the AI sticks to real camp facts instead of guessing.
+      </div>
+      <textarea id="camp_notes" rows="14" placeholder="Paste your SEED_POSTS_FILLED.md content, or any camp list, here...">${(DB.campNotes||'').replace(/</g,'&lt;')}</textarea>
+      <div style="display:flex; gap:8px; margin-top:10px;">
+        <button class="btn btn-primary" onclick="saveCampNotes()">Save Notes</button>
+        <button class="btn btn-ghost" onclick="clearCampNotes()">Clear</button>
+      </div>
+      <div id="campNotesStatus" style="margin-top:8px; font-size:12.5px; color:var(--eucalyptus-dark);"></div>
+    </div>
+    <div class="route-divider"><span class="txt">Structured camps (optional)</span><div class="line"></div></div>
+    <div class="card">
+      <div style="font-size:12px; color:var(--ink-soft); margin-bottom:10px;">
+        Only use this if you want a clean per-camp table (e.g. once you confirm GPS for specific spots). Not required — the notes above are enough to start generating content.
+      </div>
+      <div class="field"><label>Name</label><input id="camp_name"></div>
+      <div class="grid grid-3">
+        <div class="field"><label>State</label><select id="camp_state">${STATES.filter(s=>s!=='Australia Wide').map(s=>`<option>${s}</option>`).join('')}</select></div>
+        <div class="field"><label>Latitude (optional)</label><input id="camp_lat" placeholder="-31.267"></div>
+        <div class="field"><label>Longitude (optional)</label><input id="camp_lng" placeholder="120.336"></div>
+      </div>
+      <div class="field"><label>Cost / Notes</label><input id="camp_cost" placeholder="$12-15/night · self-contained only"></div>
+      <button class="btn btn-primary" onclick="addCampManual()">Add Camp</button>
+      ${DB.camps.length ? `
+        <table style="margin-top:16px;">
+          <thead><tr><th>Name</th><th>State</th><th>GPS</th><th>Cost / Notes</th><th></th></tr></thead>
+          <tbody>
+            ${DB.camps.map(c=>`
+              <tr>
+                <td style="font-weight:600;">${c.name}</td>
+                <td>${c.state}</td>
+                <td class="mono">${c.lat && c.lng ? `${c.lat}, ${c.lng}` : '🟡 Needs GPS'}</td>
+                <td>${c.cost||c.notes||'—'}</td>
+                <td><button class="btn btn-ghost btn-sm" onclick="deleteCamp('${c.id}')">Remove</button></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      ` : ''}
+    </div>
+  `;
+}
+function wireCamps(){}
+function saveCampNotes(){
+  DB.campNotes = document.getElementById('camp_notes').value;
+  saveDB(DB);
+  document.getElementById('campNotesStatus').textContent = 'Saved — this is now used as reference for Idea Generator & Post Studio.';
+}
+function clearCampNotes(){
+  if(confirm('Clear reference notes?')){ DB.campNotes=''; saveDB(DB); render(); }
+}
+function addCampManual(){
+  const name = document.getElementById('camp_name').value.trim();
+  if(!name){ alert('Camp name is required'); return; }
+  DB.camps.push({
+    id:cid(), name, state: document.getElementById('camp_state').value,
+    lat: document.getElementById('camp_lat').value.trim(), lng: document.getElementById('camp_lng').value.trim(),
+    cost: document.getElementById('camp_cost').value.trim(), notes:''
+  });
+  saveDB(DB); render();
+}
+function deleteCamp(id){ DB.camps = DB.camps.filter(c=>c.id!==id); saveDB(DB); render(); }
+function clearCamps(){ if(confirm('Remove all camps?')){ DB.camps=[]; saveDB(DB); render(); } }
+
+/* ---- Settings ---- */
+function pageSettings(){
+  const s = getAISettings();
+  return `
+    <div class="card" style="max-width:560px;">
+      <h3 style="margin-top:0;">Claude API</h3>
+      <div style="font-size:12.5px; color:var(--ink-soft); line-height:1.6; margin-bottom:16px;">
+        Your key is saved only in this browser's local storage — it is never written into the page's code or your GitHub repo. Because this is a static site, the key is visible in your browser's network requests, so keep this page bookmarked privately rather than shared publicly.
+      </div>
+      <div class="field"><label>Anthropic API Key</label><input id="set_key" type="password" value="${s.apiKey||''}" placeholder="sk-ant-..."></div>
+      <div class="field"><label>Model</label>
+        <select id="set_model">
+          <option value="claude-sonnet-5" ${s.model==='claude-sonnet-5'?'selected':''}>claude-sonnet-5</option>
+          <option value="claude-opus-4-8" ${s.model==='claude-opus-4-8'?'selected':''}>claude-opus-4-8</option>
+          <option value="claude-haiku-4-5-20251001" ${s.model==='claude-haiku-4-5-20251001'?'selected':''}>claude-haiku-4-5-20251001</option>
+        </select>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn btn-primary" onclick="doSaveSettings()">Save</button>
+        <button class="btn btn-ghost" onclick="doTestConnection()">Test Connection</button>
+      </div>
+      <div id="settingsStatus" style="margin-top:12px; font-size:13px;"></div>
+      <div style="margin-top:20px; font-size:12px; color:var(--ink-soft);">
+        Without a key, Idea Generator and Post Studio fall back to offline template simulation — useful for testing the flow without any cost.
+      </div>
+    </div>
+  `;
+}
+function wireSettings(){}
+function doSaveSettings(){
+  saveAISettings({apiKey: document.getElementById('set_key').value.trim(), model: document.getElementById('set_model').value});
+  document.getElementById('settingsStatus').innerHTML = `<span style="color:var(--eucalyptus-dark); font-weight:600;">Saved.</span>`;
+}
+async function doTestConnection(){
+  doSaveSettings();
+  const status = document.getElementById('settingsStatus');
+  status.innerHTML = 'Testing…';
+  try{
+    const res = await callClaude('Reply with exactly one word: OK', 'ping');
+    status.innerHTML = `<span style="color:var(--eucalyptus-dark); font-weight:600;">Connected — response: "${(res||'').trim()}"</span>`;
+  }catch(err){
+    status.innerHTML = `<span style="color:var(--rust); font-weight:600;">Failed: ${err.message}</span>`;
+  }
+}
+
+/* ---- Command Center ---- */
+function pageCommand(){
+  const dayName = new Date().toLocaleDateString('en-AU',{weekday:'long'});
+  const sched = WEEKLY_SCHEDULE[dayName] || WEEKLY_SCHEDULE.Monday;
+  const todayItem = DB.calendar.find(c=>c.status==='READY') || DB.calendar[0];
+  const pillarCounts = {};
+  PILLARS.forEach(p=>pillarCounts[p]=0);
+  [...DB.ideas, ...DB.calendar].forEach(i=>{ if(pillarCounts[i.pillar]!==undefined) pillarCounts[i.pillar]++; });
+  const total = Object.values(pillarCounts).reduce((a,b)=>a+b,0) || 1;
+  const maxPillar = Object.entries(pillarCounts).sort((a,b)=>b[1]-a[1])[0];
+  const minPillar = Object.entries(pillarCounts).sort((a,b)=>a[1]-b[1])[0];
+
+  const kpis = [
+    {label:'Posts Planned', value: DB.calendar.filter(c=>c.status!=='PUBLISHED').length},
+    {label:'Published', value: DB.calendar.filter(c=>c.status==='PUBLISHED').length},
+    {label:'Ideas Waiting', value: DB.ideas.filter(i=>i.status==='IDEA').length},
+    {label:'Drafts', value: DB.ideas.filter(i=>i.status==='DRAFT').length},
+  ];
+
+  return `
+    <div class="card" style="background:linear-gradient(135deg, var(--eucalyptus-dark), var(--eucalyptus)); color:#F4F0DF; border:none; margin-bottom:20px;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:20px; flex-wrap:wrap;">
+        <div>
+          <div class="pill" style="background:rgba(255,255,255,0.16); color:#F4F0DF; margin-bottom:10px;">${sched.tag}</div>
+          <div class="display" style="font-size:26px; font-weight:600; max-width:560px; line-height:1.25;">${todayItem ? todayItem.title : 'No post scheduled — generate one now'}</div>
+          <div style="font-size:13px; opacity:.8; margin-top:8px;">Pillar: ${sched.pillar} · Suggested for ${dayName}</div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px; min-width:170px;">
+          <button class="btn btn-ochre" onclick="goTo('studio')">✎ Generate Post</button>
+          <button class="btn" style="background:rgba(255,255,255,0.14); color:#F4F0DF;" onclick="goTo('ideas')">✦ Generate Ideas</button>
+          <button class="btn" style="background:rgba(255,255,255,0.14); color:#F4F0DF;" onclick="goTo('calendar')">▤ View Calendar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="route-divider"><span class="txt">This Week</span><div class="line"></div></div>
+    <div class="grid grid-4" style="margin-bottom:20px;">
+      ${kpis.map(k=>`
+        <div class="card">
+          <div class="kpi-label">${k.label}</div>
+          <div class="kpi-value">${k.value}</div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="route-divider"><span class="txt">Pillar Balance</span><div class="line"></div></div>
+    <div class="grid grid-2">
+      <div class="card">
+        ${PILLARS.map(p=>{
+          const pct = Math.round((pillarCounts[p]/total)*100);
+          return `<div class="bar-row">
+            <div class="bar-label">${p}</div>
+            <div class="bar-track"><div class="bar-fill" style="width:${pct}%; background:${p===maxPillar[0]?'var(--ochre)':'var(--eucalyptus)'};"></div></div>
+            <div class="bar-val">${pct}%</div>
+          </div>`;
+        }).join('')}
+      </div>
+      <div class="card">
+        <div class="section-label">⚠️ Gap Watch</div>
+        <p style="font-size:13.5px; line-height:1.6; margin:0 0 10px 0;">
+          <strong>${maxPillar[0]}</strong> is your most-used pillar right now. Consider balancing with more <strong>${minPillar[0]}</strong> content this week.
+        </p>
+        <div class="section-label" style="margin-top:16px;">What Should I Post Today?</div>
+        <div style="font-size:13.5px; line-height:1.7;">
+          <div><strong>Primary:</strong> ${todayItem ? todayItem.title : '—'}</div>
+          <div><strong>Backup:</strong> ${DB.ideas.find(i=>i.pillar==='Community / UGC')?.title || DB.ideas[1]?.title || '—'}</div>
+          <div><strong>Quick post:</strong> ${DB.ideas.find(i=>i.format==='Poll')?.title || 'Beach camp or bush camp?'}</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ---- Idea Generator ---- */
+function pageIdeas(){
+  return `
+    <div class="grid grid-2">
+      <div>
+        <div class="card">
+          <h3 style="margin-top:0;">Generate Ideas</h3>
+          <div class="grid grid-3">
+            <div class="field"><label>Content Pillar</label>
+              <select id="in_pillar">${PILLARS.map(p=>`<option>${p}</option>`).join('')}</select></div>
+            <div class="field"><label>State</label>
+              <select id="in_state">${STATES.map(s=>`<option>${s}</option>`).join('')}</select></div>
+            <div class="field"><label>Format</label>
+              <select id="in_format">${FORMATS.map(f=>`<option>${f}</option>`).join('')}</select></div>
+            <div class="field"><label>Goal</label>
+              <select id="in_goal">${GOALS.map(g=>`<option>${g}</option>`).join('')}</select></div>
+            <div class="field"><label>Audience</label>
+              <input id="in_audience" placeholder="e.g. Grey nomads"></div>
+            <div class="field"><label>How many?</label>
+              <select id="in_count"><option>5</option><option>10</option><option>20</option></select></div>
+          </div>
+          <div class="field"><label>Topic / keyword (optional)</label>
+            <input id="in_topic" placeholder="e.g. free camps near Byron Bay"></div>
+          <button class="btn btn-primary" onclick="doGenerateIdeas()">✦ Generate Ideas</button>
+          <div style="font-size:11.5px; color:var(--ink-soft); margin-top:10px;">
+            Prototype note: this uses template-based simulation, not a live model call. The Claude Code build wires this to the real Idea Generator prompt.
+          </div>
+        </div>
+        <div id="ideaResults" style="margin-top:18px;"></div>
+      </div>
+      <div>
+        <div class="card">
+          <h3 style="margin-top:0; font-size:15px;">Saved Ideas (<span id="savedIdeasCount">${DB.ideas.length}</span>)</h3>
+          <div id="savedIdeasPanel">${savedIdeasPanelHTML()}</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function savedIdeasPanelHTML(){
+  return DB.ideas.slice(0,6).map(i=>`
+    <div style="padding:8px 0; border-bottom:1px solid var(--line); font-size:13px;">
+      <div style="font-weight:600;">${i.title}</div>
+      <div style="color:var(--ink-soft); font-size:11.5px;">${i.pillar} · ${i.state}</div>
+    </div>
+  `).join('');
+}
+function wireIdeas(){}
+async function doGenerateIdeas(){
+  const input = {
+    pillar: document.getElementById('in_pillar').value,
+    state: document.getElementById('in_state').value,
+    format: document.getElementById('in_format').value,
+    goal: document.getElementById('in_goal').value,
+    audience: document.getElementById('in_audience').value,
+    topic: document.getElementById('in_topic').value,
+  };
+  const count = parseInt(document.getElementById('in_count').value,10);
+  const box = document.getElementById('ideaResults');
+  const settings = getAISettings();
+
+  if(!settings.apiKey){
+    const ideas = simulateIdeas(input, count);
+    box.innerHTML = ideas.map(idea=>ideaCard(idea)).join('');
+    window.__lastIdeas = ideas;
+    return;
+  }
+
+  box.innerHTML = `<div class="empty">Generating ${count} ideas with Claude…</div>`;
+  try{
+    const sys = `You are a content strategist for an Australian Facebook group called "Free Camps Australia", for caravan/campervan/motorhome travellers. Follow these rules strictly: community-first, useful before promotional, Australian tone, never invent campsite facts (fees, GPS, facilities, rules) — flag as "Needs Verification" if unsure, avoid generic AI writing and excessive emojis. Respond ONLY with a JSON array, no preamble, no markdown fences. Each item: {"title","hook","desc","cta","affiliate","evergreen"} where affiliate is "None"|"Low"|"High" and evergreen is true/false.`;
+    const usr = `Generate ${count} content ideas.\nPillar: ${input.pillar}\nState: ${input.state}\nFormat: ${input.format}\nGoal: ${input.goal}\nAudience: ${input.audience||'general group members'}\nTopic/keyword: ${input.topic||'(open)'}${campsContextBlock()}`;
+    const raw = await callClaude(sys, usr);
+    const clean = raw.replace(/```json|```/g,'').trim();
+    const parsed = JSON.parse(clean);
+    const ideas = parsed.map(p=>({
+      id:cid(), title:p.title, hook:p.hook, pillar:input.pillar, state:input.state, format:input.format,
+      goal:input.goal, desc:p.desc, cta:p.cta, affiliate:p.affiliate||'None', evergreen:!!p.evergreen,
+      status:'IDEA', createdDaysAgo:0
+    }));
+    box.innerHTML = ideas.map(idea=>ideaCard(idea)).join('');
+    window.__lastIdeas = ideas;
+  }catch(err){
+    box.innerHTML = `<div class="empty">Couldn't reach Claude API: ${err.message}<br>Check your API key in Settings.<br><br><button class="btn btn-ghost btn-sm" onclick="doGenerateIdeasSimFallback()">Use offline simulation instead</button></div>`;
+  }
+}
+function doGenerateIdeasSimFallback(){
+  const input = {
+    pillar: document.getElementById('in_pillar').value, state: document.getElementById('in_state').value,
+    format: document.getElementById('in_format').value, goal: document.getElementById('in_goal').value,
+    audience: document.getElementById('in_audience').value, topic: document.getElementById('in_topic').value,
+  };
+  const count = parseInt(document.getElementById('in_count').value,10);
+  const ideas = simulateIdeas(input, count);
+  document.getElementById('ideaResults').innerHTML = ideas.map(idea=>ideaCard(idea)).join('');
+  window.__lastIdeas = ideas;
+}
+function ideaCard(idea){
+  return `
+    <div class="idea-card">
+      <div class="idea-title">${idea.title}</div>
+      <div class="idea-hook">"${idea.hook}"</div>
+      <div class="idea-meta">
+        <span class="pill pill-eucalyptus">${idea.pillar}</span>
+        <span class="pill pill-ochre">${idea.state}</span>
+        <span class="pill pill-rust">${idea.format}</span>
+      </div>
+      <div style="font-size:13px; color:var(--ink-soft);">${idea.desc}</div>
+      <div class="idea-actions">
+        <button class="btn btn-primary btn-sm" onclick="sendToStudio('${escapeAttr(idea.title)}','${idea.pillar}','${idea.state}','${idea.goal}')">Generate Post</button>
+        <button id="save_${idea.id}" class="btn btn-ghost btn-sm" onclick="saveIdea('${idea.id}')">Save Idea</button>
+        <button id="cal_${idea.id}" class="btn btn-ghost btn-sm" onclick="addToCalendar('${escapeAttr(idea.title)}','${idea.pillar}','${idea.state}','${idea.format}','cal_${idea.id}')">Add to Calendar</button>
+      </div>
+    </div>
+  `;
+}
+function escapeAttr(s){ return s.replace(/'/g,"\\'"); }
+function saveIdea(id){
+  const idea = (window.__lastIdeas||[]).find(i=>i.id===id);
+  if(!idea) return;
+  DB.ideas.unshift(idea);
+  saveDB(DB);
+  // Update just this card's button — don't re-render the whole page, or the other generated ideas would vanish
+  const btn = document.getElementById('save_'+id);
+  if(btn){ btn.textContent = '✓ Saved'; btn.disabled = true; btn.classList.remove('btn-ghost'); btn.style.opacity = '0.6'; }
+  const panel = document.getElementById('savedIdeasPanel');
+  if(panel) panel.innerHTML = savedIdeasPanelHTML();
+  const countEl = document.getElementById('savedIdeasCount');
+  if(countEl) countEl.textContent = DB.ideas.length;
+}
+function addToCalendar(title, pillar, state, format, btnId){
+  const d = new Date();
+  DB.calendar.unshift({id:cid(), date:d.toISOString().slice(0,10), dayName:d.toLocaleDateString('en-AU',{weekday:'long'}), title, pillar, state, format, status:'IDEA'});
+  saveDB(DB);
+  if(btnId){
+    const btn = document.getElementById(btnId);
+    if(btn){ btn.textContent = '✓ Added'; btn.disabled = true; btn.style.opacity = '0.6'; }
+  }
+}
+function sendToStudio(title, pillar, state, goal){
+  window.__studioPrefill = {title, pillar, state, goal};
+  goTo('studio');
+}
+
+/* ---- Post Studio ---- */
+function pageStudio(){
+  const pre = window.__studioPrefill || {};
+  return `
+    <div class="grid grid-2">
+      <div class="card">
+        <h3 style="margin-top:0;">Post Studio</h3>
+        <div class="field"><label>Topic</label><input id="s_topic" value="${pre.title? escapeAttr(pre.title):''}" placeholder="e.g. Sydney → Brisbane free camps"></div>
+        <div class="grid grid-3">
+          <div class="field"><label>Pillar</label><select id="s_pillar">${PILLARS.map(p=>`<option ${p===pre.pillar?'selected':''}>${p}</option>`).join('')}</select></div>
+          <div class="field"><label>State</label><select id="s_state">${STATES.map(s=>`<option ${s===pre.state?'selected':''}>${s}</option>`).join('')}</select></div>
+          <div class="field"><label>Goal</label><select id="s_goal">${GOALS.map(g=>`<option ${g===pre.goal?'selected':''}>${g}</option>`).join('')}</select></div>
+        </div>
+        <div class="grid grid-3">
+          <div class="field"><label>Tone</label><select id="s_tone"><option>Community-first</option><option>Informative</option><option>Casual</option><option>Playful</option></select></div>
+          <div class="field"><label>Length</label><select id="s_length"><option>Short</option><option>Medium</option><option>Long</option></select></div>
+          <div class="field"><label>CTA Type</label><select id="s_cta"><option>Question</option><option>Save</option><option>Share</option><option>Comment</option></select></div>
+        </div>
+        <div class="field"><label>Optional factual notes (for accuracy)</label><textarea id="s_notes" rows="2" placeholder="e.g. verified toilets + water, no fees, dogs allowed on lead"></textarea></div>
+        <button class="btn btn-primary" onclick="doGeneratePost()">✎ Generate Post</button>
+      </div>
+      <div class="card" id="postOutputCard">
+        <h3 style="margin-top:0; font-size:15px;">Output</h3>
+        <div class="empty">Generate a post to see the hook, main copy, and CTA here.</div>
+      </div>
+    </div>
+  `;
+}
+function wireStudio(){ window.__studioPrefill = null; }
+async function doGeneratePost(){
+  const input = {
+    topic: document.getElementById('s_topic').value || 'this topic',
+    pillar: document.getElementById('s_pillar').value,
+    state: document.getElementById('s_state').value,
+    goal: document.getElementById('s_goal').value,
+    tone: document.getElementById('s_tone').value,
+    length: document.getElementById('s_length').value,
+    ctaType: document.getElementById('s_cta').value,
+    notes: document.getElementById('s_notes').value,
+  };
+  const card = document.getElementById('postOutputCard');
+  const settings = getAISettings();
+
+  if(!settings.apiKey){
+    renderPostOutput(simulatePost(input), input);
+    return;
+  }
+
+  card.innerHTML = `<h3 style="margin-top:0; font-size:15px;">Output</h3><div class="empty">Writing post with Claude…</div>`;
+  try{
+    const sys = `You write Facebook posts for the Australian group "Free Camps Australia" (caravan/campervan/motorhome travellers). Rules: community-first not promotional, short scannable paragraphs, natural Australian tone, never invent campsite facts (fees/GPS/facilities/rules) — say "Needs Verification" if unsure, avoid generic AI writing and excessive emojis. Respond ONLY with JSON, no markdown fences: {"hook":"...","body":"...","cta":"..."}`;
+    const usr = `Topic: ${input.topic}\nPillar: ${input.pillar}\nState: ${input.state}\nGoal: ${input.goal}\nTone: ${input.tone}\nLength: ${input.length}\nCTA type: ${input.ctaType}\nFactual notes: ${input.notes||'(none provided)'}${campsContextBlock()}`;
+    const raw = await callClaude(sys, usr);
+    const clean = raw.replace(/```json|```/g,'').trim();
+    const parsed = JSON.parse(clean);
+    renderPostOutput(parsed, input);
+  }catch(err){
+    card.innerHTML = `<h3 style="margin-top:0; font-size:15px;">Output</h3><div class="empty">Couldn't reach Claude API: ${err.message}<br>Check your API key in Settings.<br><br><button class="btn btn-ghost btn-sm" onclick="renderPostOutput(simulatePost({topic:document.getElementById('s_topic').value||'this topic',goal:document.getElementById('s_goal').value}), {topic:document.getElementById('s_topic').value,pillar:document.getElementById('s_pillar').value,state:document.getElementById('s_state').value})">Use offline simulation instead</button></div>`;
+  }
+}
+function renderPostOutput(res, input){
+  const card = document.getElementById('postOutputCard');
+  card.innerHTML = `
+    <h3 style="margin-top:0; font-size:15px;">Output</h3>
+    <div class="section-label">Hook</div>
+    <div class="post-output" style="margin-bottom:14px;">${res.hook}</div>
+    <div class="section-label">Main Post</div>
+    <div class="post-output" style="margin-bottom:14px;">${res.body}</div>
+    <div class="section-label">CTA</div>
+    <div class="post-output" style="margin-bottom:14px;">${res.cta}</div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <button class="btn btn-ghost btn-sm">Shorter</button>
+      <button class="btn btn-ghost btn-sm">More Casual</button>
+      <button class="btn btn-ghost btn-sm">Add Question</button>
+      <button class="btn btn-ochre btn-sm" onclick="saveDraft('${escapeAttr(input.topic)}','${input.pillar}','${input.state}')">Save Draft</button>
+    </div>
+  `;
+}
+function saveDraft(title, pillar, state){
+  const d = new Date();
+  DB.calendar.unshift({id:cid(), date:d.toISOString().slice(0,10), dayName:d.toLocaleDateString('en-AU',{weekday:'long'}), title, pillar, state, format:'Facebook Post', status:'DRAFT'});
+  saveDB(DB); alert('Saved as draft to Calendar'); render();
+}
+
+/* ---- Calendar ---- */
+function pageCalendar(){
+  const items = [...DB.calendar].sort((a,b)=>a.date.localeCompare(b.date));
+  return `
+    <div class="card">
+      <table>
+        <thead><tr><th>Date</th><th>Day</th><th>Title</th><th>Pillar</th><th>State</th><th>Status</th></tr></thead>
+        <tbody>
+          ${items.map(i=>`
+            <tr>
+              <td class="mono">${i.date}</td>
+              <td>${i.dayName}</td>
+              <td style="font-weight:600;">${i.title}</td>
+              <td><span class="pill pill-eucalyptus">${i.pillar}</span></td>
+              <td>${i.state}</td>
+              <td><span class="status-tag status-${i.status}">${i.status}</span></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+/* ---- Library ---- */
+function pageLibrary(){
+  return `
+    <div class="filters">
+      <select id="f_pillar"><option value="">All Pillars</option>${PILLARS.map(p=>`<option>${p}</option>`).join('')}</select>
+      <select id="f_state"><option value="">All States</option>${STATES.map(s=>`<option>${s}</option>`).join('')}</select>
+      <input id="f_kw" placeholder="Search keyword..." style="max-width:220px;">
+    </div>
+    <div id="libResults"></div>
+  `;
+}
+function wireLibrary(){
+  renderLibResults();
+  document.getElementById('f_pillar').addEventListener('change', renderLibResults);
+  document.getElementById('f_state').addEventListener('change', renderLibResults);
+  document.getElementById('f_kw').addEventListener('input', renderLibResults);
+}
+function renderLibResults(){
+  const pillar = document.getElementById('f_pillar').value;
+  const state = document.getElementById('f_state').value;
+  const kw = (document.getElementById('f_kw').value||'').toLowerCase();
+  const filtered = DB.ideas.filter(i=>
+    (!pillar || i.pillar===pillar) &&
+    (!state || i.state===state) &&
+    (!kw || i.title.toLowerCase().includes(kw))
+  );
+  document.getElementById('libResults').innerHTML = filtered.length ? filtered.map(ideaCard).join('') : `<div class="empty">No content matches these filters.</div>`;
+  window.__lastIdeas = filtered;
+}
+
+/* =========================================================
+   INIT
+   ========================================================= */
+render();
+</script>
+</body>
+</html>
